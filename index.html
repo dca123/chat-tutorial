@@ -26,11 +26,12 @@
 
     <div id="isTyping"></div>
     <form id="form" action="">
+      <select id="dm" name="users"></select>
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var username =  prompt('username') || 'anon';
+      var username = prompt('username') || 'anon';
       var socket = io();
 
       var messages = document.getElementById('messages');
@@ -38,6 +39,7 @@
       var form = document.getElementById('form');
       var input = document.getElementById('input');
       var isTyping =  document.getElementById('isTyping');
+      var dm =  document.getElementById('dm');
       const addMessage = (message) => {
         var item = document.createElement('li');
         item.textContent = message;
@@ -48,13 +50,19 @@
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
-          socket.emit('chat message', input.value, username);
-          addMessage(`anon: ${input.value}`)
-          input.value = '';
+          if (dm.value == 'all'){
+            socket.emit('chat message', input.value, username);
+            addMessage(`${username}: ${input.value}`)
+            input.value = '';
+          } else {
+             socket.emit('dm', dm.value, input.value);
+              addMessage(`dm to ${dm.value}: ${input.value}`)
+              input.value = '';
+          }
         }
       });
 
-      form.addEventListener('input', (e) => {
+      input.addEventListener('input', (e) => {
         e.preventDefault();
         socket.emit('chat input', username)
       })
@@ -63,6 +71,9 @@
         console.log('disconnected from server');
       })
       socket.on('chat message', function(msg) {
+        addMessage(msg)
+      });
+      socket.on('dm', function(msg) {
         addMessage(msg)
       });
       socket.on('chat input', function(msg) {
@@ -74,6 +85,20 @@
           var item = document.createElement('li');
           item.textContent = name;
           activeUsers.appendChild(item);
+        });     
+
+        dm.innerHTML = "";
+        var item = document.createElement('option');
+        item.textContent = "all";
+        item.value = "all";
+        dm.appendChild(item);
+        usernames.forEach(name => {
+          if (name != username) {
+            var item = document.createElement('option');
+            item.textContent = name;
+            item.value = name;
+            dm.appendChild(item);
+          }
         });        
       })
     </script>
