@@ -13,10 +13,12 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      #isTyping {position: fixed; bottom: 3rem; left: 0; right: 0; display: flex;}
     </style>
   </head>
   <body>
     <ul id="messages"></ul>
+    <div id="isTyping"></div>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
@@ -28,7 +30,7 @@
       var messages = document.getElementById('messages');
       var form = document.getElementById('form');
       var input = document.getElementById('input');
-
+      var isTyping =  document.getElementById('isTyping');
       const addMessage = (message) => {
         var item = document.createElement('li');
         item.textContent = message;
@@ -44,12 +46,20 @@
           input.value = '';
         }
       });
+
+      form.addEventListener('input', (e) => {
+        e.preventDefault();
+        socket.emit('chat input', username)
+      })
       
       socket.on('disconnect', () => {
         console.log('disconnected from server');
       })
       socket.on('chat message', function(msg) {
         addMessage(msg)
+      });
+      socket.on('chat input', function(msg) {
+        isTyping.innerHTML = msg
       });
     </script>
   </body>
