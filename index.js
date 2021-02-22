@@ -18,7 +18,7 @@ io.on('connection', (socket, username) => {
         io.emit('chat message', `${username}: ${msg}`)
     })
     socket.on('user connect', (username) => {
-        io.emit('chat message', `${username} has connected to the chatroom`)
+        io.emit('chat message', `${username} has connected to the chatroom.`)
     })
 
 })
