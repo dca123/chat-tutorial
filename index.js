@@ -12,6 +12,11 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('a user disconnected');
     })
+    socket.on('chat message', (msg) => {
+        console.log(`message: ${msg}`);
+        io.emit('chat message', msg)
+    })
+
 })
 http.listen(3000, () => {
     console.log('Listening on http://localhost:3000');
