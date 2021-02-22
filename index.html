@@ -29,11 +29,18 @@
       var form = document.getElementById('form');
       var input = document.getElementById('input');
 
+      const addMessage = (message) => {
+        var item = document.createElement('li');
+        item.textContent = message;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
       socket.emit("user connect", username);
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
           socket.emit('chat message', input.value, username);
+          addMessage(`anon: ${input.value}`)
           input.value = '';
         }
       });
@@ -42,10 +49,7 @@
         console.log('disconnected from server');
       })
       socket.on('chat message', function(msg) {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        addMessage(msg)
       });
     </script>
   </body>
