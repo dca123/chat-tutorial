@@ -5,29 +5,36 @@
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px);}
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
-      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages { list-style-type: none; margin: 0; padding: 0; width: 100%;}
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      #active {margin: 0; margin-left: 2rem; width: 10%;}
+      #content {display: flex; width: 100%; justify-content: space-between;}
       #isTyping {position: fixed; bottom: 3rem; left: 0; right: 0; display: flex;}
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
+    <div id="content">
+      <ul id="messages"></ul>
+      <ul id="active"></ul>
+    </div>
+
     <div id="isTyping"></div>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var username = prompt('Username') || 'anon';
+      var username =  prompt('username') || 'anon';
       var socket = io();
 
       var messages = document.getElementById('messages');
+      var activeUsers = document.getElementById('active');
       var form = document.getElementById('form');
       var input = document.getElementById('input');
       var isTyping =  document.getElementById('isTyping');
@@ -61,6 +68,14 @@
       socket.on('chat input', function(msg) {
         isTyping.innerHTML = msg
       });
+      socket.on("user connect", (usernames) => {
+        activeUsers.innerHTML = "";
+        usernames.forEach(name => {
+          var item = document.createElement('li');
+          item.textContent = name;
+          activeUsers.appendChild(item);
+        });        
+      })
     </script>
   </body>
 </html>
